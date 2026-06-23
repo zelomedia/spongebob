@@ -1,0 +1,1149 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bikini Bottom Eisparadies – Das neue SpongeBob Eis</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Fredoka & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(180deg, #1e3a8a 0%, #0f172a 100%);
+            overflow-x: hidden;
+        }
+        .font-bubble {
+            font-family: 'Fredoka', sans-serif;
+        }
+        /* Custom Sea Bobbing Animation */
+        @keyframes bob {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(2deg); }
+        }
+        .animate-bob {
+            animation: bob 4s ease-in-out infinite;
+        }
+        @keyframes bob-slow {
+            0%, 100% { transform: translateY(0px) rotate(-6deg); }
+            50% { transform: translateY(-12px) rotate(-4deg); }
+        }
+        @keyframes bob-mid {
+            0%, 100% { transform: translateY(0px) rotate(8deg); }
+            50% { transform: translateY(-18px) rotate(10deg); }
+        }
+        @keyframes bob-fast {
+            0%, 100% { transform: translateY(0px) rotate(-12deg); }
+            50% { transform: translateY(-15px) rotate(-10deg); }
+        }
+        .animate-bob-slow {
+            animation: bob-slow 7s ease-in-out infinite;
+        }
+        .animate-bob-mid {
+            animation: bob-mid 5s ease-in-out infinite;
+        }
+        .animate-bob-fast {
+            animation: bob-fast 4s ease-in-out infinite;
+        }
+        @keyframes float-bubble {
+            0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(-20vh) scale(1.2); opacity: 0; }
+        }
+        .bubble-element {
+            animation: float-bubble 12s linear infinite;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3b82f6;
+            border-radius: 5px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #60a5fa;
+        }
+        /* Game elements styling */
+        .bubble-game-item {
+            transition: transform 0.1s ease, opacity 0.2s ease;
+        }
+        .bubble-game-item:active {
+            transform: scale(0.8);
+        }
+    </style>
+</head>
+<body class="text-white selection:bg-yellow-400 selection:text-blue-900">
+
+    <!-- Background floating bubbles container -->
+    <div id="bubble-bg" class="absolute inset-0 pointer-events-none z-0 overflow-hidden"></div>
+
+    <!-- Main App Container -->
+    <div id="app" class="min-h-screen relative overflow-hidden font-sans">
+        
+        <header class="sticky top-0 z-40 bg-blue-950/80 backdrop-blur-md border-b-4 border-yellow-400 px-4 md:px-12 py-4">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
+                <!-- Logo -->
+                <a href="#" class="flex items-center gap-3 group">
+                    <span class="font-bubble text-3xl md:text-4xl text-yellow-400 drop-shadow-[0_4px_0_rgba(0,0,0,1)] tracking-wider transform group-hover:scale-105 transition-transform inline-block">
+                        SPONGEBOB <span class="text-white">EIS</span>
+                    </span>
+                </a>
+
+                <!-- Center Nav Links -->
+                <nav class="hidden md:flex items-center gap-8 font-bubble text-lg">
+                    <a href="#sorten" class="text-white hover:text-yellow-400 transition-colors drop-shadow">🍨 Sorten</a>
+                    <a href="#quiz" class="text-white hover:text-yellow-400 transition-colors drop-shadow">🧠 Sorte finden</a>
+                    <a href="#bubble-game" class="text-white hover:text-yellow-400 transition-colors drop-shadow">🧼 Blubberspiel</a>
+                </nav>
+
+                <!-- Audio & Cart Controls -->
+                <div class="flex items-center gap-4">
+                    <!-- Audio Control Toggle Button -->
+                    <button id="audio-toggle-btn" class="p-3 bg-blue-900/60 rounded-xl hover:bg-yellow-400 hover:text-blue-950 transition-all text-white border border-blue-700/50" title="Sound stummschalten">
+                        <i id="audio-icon" class="fa-solid fa-volume-high text-xl"></i>
+                    </button>
+
+                    <!-- Cart Drawer Trigger Button -->
+                    <button id="cart-toggle-btn" class="relative flex items-center gap-2 bg-yellow-400 hover:bg-yellow-300 text-blue-950 font-bubble px-5 py-2.5 rounded-2xl shadow-lg border-2 border-white transition-transform active:scale-95">
+                        <i class="fa-solid fa-cart-shopping text-xl"></i>
+                        <span class="hidden sm:inline">Kühltruhe</span>
+                        <span id="cart-badge" class="hidden absolute -top-3 -right-2 bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center text-xs font-bold border-2 border-white animate-pulse">0</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="bg-gradient-to-r from-red-600 via-yellow-500 to-yellow-400 border-b-4 border-yellow-300 text-blue-950 py-3 px-4 relative z-30 shadow-lg">
+            <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-4">
+                <div class="flex flex-wrap items-center justify-center lg:justify-start gap-3 text-center lg:text-left">
+                    <span class="bg-blue-950 text-yellow-400 text-xs font-bold uppercase px-3 py-1 rounded-full animate-pulse border border-white">DEAL!</span>
+                    <a href="https://t.adcell.com/p/click?encodingId=7ecc89d24e472bd0fe1f5785834e820a" target="_blank" class="font-bubble text-base md:text-lg font-bold hover:underline flex items-center gap-2">
+                        🎉 5% Rabatt auf alle SpongeBob Eissorten!
+                        <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                    </a>
+                </div>
+                
+                <!-- Live Countdown Clock and Code Copy -->
+                <div class="flex flex-wrap items-center justify-center gap-4">
+                    <div class="flex items-center gap-1.5 font-bubble text-xs md:text-sm bg-blue-950/20 px-3 py-1.5 rounded-xl border border-blue-950/30">
+                        <span class="font-bold uppercase tracking-wider text-[10px] mr-1">Endet in:</span>
+                        <div class="flex items-center gap-0.5 font-mono">
+                            <span id="timer-days" class="bg-blue-950 text-white font-bold px-1.5 py-0.5 rounded">00</span>d
+                            <span id="timer-hours" class="bg-blue-950 text-white font-bold px-1.5 py-0.5 rounded">00</span>h
+                            <span id="timer-minutes" class="bg-blue-950 text-white font-bold px-1.5 py-0.5 rounded">00</span>m
+                            <span id="timer-seconds" class="bg-blue-950 text-white font-bold px-1.5 py-0.5 rounded">00</span>s
+                        </div>
+                    </div>
+
+                    <!-- Coupon Code Copy Widget -->
+                    <div class="flex items-center bg-blue-950 text-white rounded-xl overflow-hidden border-2 border-white shadow-md">
+                        <span class="px-3 py-1 text-xs font-mono font-bold select-all tracking-wider">BVEALICRGF</span>
+                        <button onclick="copyVoucherCode()" class="bg-yellow-400 hover:bg-yellow-300 text-blue-950 px-3 py-1 text-xs font-bubble font-bold transition-colors border-l border-blue-900 flex items-center gap-1">
+                            <i class="fa-regular fa-copy"></i>
+                            <span>Kopieren</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- Adcell Promo Code View Pixel -->
+            <img src="https://t.adcell.com/p/view?encodingId=7ecc89d24e472bd0fe1f5785834e820a" border="0" width="1" height="1" alt="" class="hidden" />
+        </div>
+
+        <div class="w-full bg-blue-950 relative overflow-hidden">
+            <div class="relative w-full overflow-hidden group">
+                <img src="https://i.ibb.co/b5rL357w/Chat-GPT-Image-23-Juni-2026-11-14-49.png" 
+                     alt="SpongeBob Bikini Bottom Key Visual" 
+                     class="w-full h-auto object-cover block transition-transform duration-700 group-hover:scale-[1.01]">
+            </div>
+        </div>
+
+        <div class="relative w-full overflow-hidden bg-gradient-to-b from-blue-950 to-blue-900 border-b-8 border-yellow-400 transition-all duration-500">
+            <!-- Background light source for depth -->
+            <div class="absolute inset-x-0 top-0 h-96 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-800/30 via-transparent to-transparent pointer-events-none"></div>
+
+            <section class="relative pt-12 pb-20 px-4 md:px-12 max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-12 z-10">
+                <!-- Text Card with premium dark-glass look for supreme readability -->
+                <div class="flex-1 text-center lg:text-left space-y-6 bg-blue-950/80 backdrop-blur-md p-6 md:p-8 rounded-3xl border-4 border-yellow-400 shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-10">
+                    <span class="inline-block bg-yellow-400 text-blue-950 font-bubble font-bold text-xs md:text-sm uppercase tracking-widest px-4 py-1.5 rounded-full border-2 border-white shadow-md">
+                        🌊 Frisch eingetroffen!
+                    </span>
+                    <h1 class="font-bubble text-4xl md:text-6xl text-yellow-300 leading-tight drop-shadow-[0_4px_0_rgba(30,58,138,1)]">
+                        Seid ihr bereit, Kinder?! 🍍
+                    </h1>
+                    <p class="text-base md:text-lg text-blue-100 max-w-2xl leading-relaxed">
+                        Holt euch die ultimative Tiefsee-Abkühlung direkt nach Hause! Entdeckt die brandneuen 6 SpongeBob-Eissorten von Zeydler & PapaFrost im praktischen 320 ml Glas. Himmlisch cremig, fruchtig oder super sauer!
+                    </p>
+                    
+                    <div class="flex flex-wrap justify-center lg:justify-start gap-4 pt-2">
+                        <a href="#sorten" class="bg-yellow-400 hover:bg-yellow-300 text-blue-950 font-bubble text-lg md:text-xl px-6 md:px-8 py-3 md:py-4 rounded-2xl border-b-4 border-yellow-600 shadow-xl transition-all transform hover:-translate-y-1 inline-block">
+                            🧁 Jetzt Sorten entdecken
+                        </a>
+                        <a href="https://t.adcell.com/p/click?encodingId=7ecc89d24e472bd0fe1f5785834e820a" target="_blank" rel="noopener noreferrer" class="bg-blue-900 hover:bg-blue-800 text-white font-bubble text-lg md:text-xl px-6 md:px-8 py-3 md:py-4 rounded-2xl border-4 border-dashed border-yellow-400 shadow-xl transition-all inline-block">
+                            🛒 5% Deal sichern
+                        </a>
+                    </div>
+
+                    <!-- Certified Badges -->
+                    <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2 text-blue-200">
+                        <div class="px-3 py-1.5 bg-blue-900/60 rounded-xl border border-blue-800 flex items-center gap-2 text-xs">
+                            <i class="fa-solid fa-certificate text-yellow-400"></i>
+                            <span>Original Zeydler Lizenzware</span>
+                        </div>
+                        <div class="px-3 py-1.5 bg-blue-900/60 rounded-xl border border-blue-800 flex items-center gap-2 text-xs">
+                            <i class="fa-solid fa-truck text-sky-400"></i>
+                            <span>TK Premium-Express Versand</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3D Overlapping Floating Cups Layer (Foreground) -->
+                <div class="flex-1 relative flex justify-center items-center h-[380px] lg:h-[480px] w-full mt-8 lg:mt-0 select-none">
+                    <div class="absolute w-80 h-80 bg-yellow-400/25 blur-3xl rounded-full z-0 animate-pulse"></div>
+                    
+                    <!-- Gary (Cookie) - Left/Back Floating -->
+                    <div class="absolute -left-4 md:left-4 bottom-12 w-40 md:w-48 z-10 animate-bob-slow cursor-pointer transition-transform duration-300 hover:scale-110" onclick="openProductDetail('gary')">
+                        <img src="https://www.papafrost.de/cdn-cgi/image/w%3D3000%2Cq%3D80%2Cf%3Dauto/media/fc/13/50/1768998492/101000_HD_1_Spongebob-Eis_Gary-Cookie_Zeydler.jpg?t=1768998492" 
+                             alt="Gary Cookie Cup" 
+                             class="w-full drop-shadow-[0_15px_15px_rgba(0,0,0,0.5)]">
+                        <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-blue-500/90 text-white text-[10px] font-bubble px-3 py-1 rounded-full shadow border border-white/50 whitespace-nowrap">
+                            🐌 Gary Cookie
+                        </div>
+                    </div>
+
+                    <!-- SpongeBob (Vanille Mango) - Center Main Floating -->
+                    <div class="absolute z-20 w-48 md:w-56 top-8 animate-bob cursor-pointer transition-transform duration-300 hover:scale-110" onclick="openProductDetail('spongebob')">
+                        <img src="https://www.papafrost.de/cdn-cgi/image/w%3D3000%2Cq%3D80%2Cf%3Dauto/media/ee/94/30/1768998495/101003_HD_1_Spongebob-Eis_Spongebob-Vanille-Mango_Zeydler.jpg?t=1768998495" 
+                             alt="SpongeBob Vanille Mango Cup" 
+                             class="w-full drop-shadow-[0_20px_20px_rgba(0,0,0,0.6)]">
+                        <div class="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-yellow-400 text-blue-950 text-xs font-bubble px-4 py-1.5 rounded-full shadow border-2 border-white whitespace-nowrap">
+                            🍍 SpongeBob Vanille-Mango
+                        </div>
+                    </div>
+
+                    <!-- Patrick Star (Erdbeer Drachenfrucht) - Right/Back Floating -->
+                    <div class="absolute -right-4 md:right-4 bottom-16 w-40 md:w-48 z-15 animate-bob-mid cursor-pointer transition-transform duration-300 hover:scale-110" onclick="openProductDetail('patrick')">
+                        <img src="https://www.papafrost.de/cdn-cgi/image/w%3D3000%2Cq%3D80%2Cf%3Dauto/media/56/8c/77/1768998490/100998_HD_1_Spongebob-Eis_Patrick-Erdbeer-Drachenfrucht_Zeydler.jpg?t=1768998490" 
+                             alt="Patrick Star Strawberry Dragonfruit Cup" 
+                             class="w-full drop-shadow-[0_15px_15px_rgba(0,0,0,0.5)]">
+                        <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-pink-500 text-white text-[10px] font-bubble px-3 py-1 rounded-full shadow border border-white/50 whitespace-nowrap">
+                            ⭐ Patricks Fav!
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <section id="sorten" class="bg-blue-950 py-16 px-4 md:px-12 relative z-10">
+            <div class="max-w-7xl mx-auto">
+                
+                <div class="text-center mb-16 space-y-4">
+                    <h2 class="font-bubble text-4xl md:text-6xl text-yellow-400 drop-shadow-[0_3px_0_rgba(0,0,0,1)]">
+                        Entdecke alle 6 Tiefsee-Sorten!
+                    </h2>
+                    <p class="text-blue-200 text-lg max-w-2xl mx-auto">
+                        Kreiert in Kooperation mit Zeydler – jedes Eis im 320 ml Glas spiegelt einen Charakter aus Bikini Bottom perfekt wider!
+                    </p>
+                </div>
+
+                <!-- Dynamic Ice Cream Cards Grid -->
+                <div id="ice-creams-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Rendered programmatically inside script -->
+                </div>
+
+            </div>
+        </section>
+
+        <div id="product-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-blue-950/90 backdrop-blur-md">
+            <!-- Programmatically rendered modal structure -->
+        </div>
+
+        <section id="quiz" class="py-20 px-4 md:px-12 bg-gradient-to-b from-blue-950 to-blue-900 border-t-8 border-yellow-400 relative z-10">
+            <div class="max-w-4xl mx-auto bg-blue-900/60 rounded-3xl p-6 md:p-12 border-4 border-yellow-400 shadow-2xl">
+                
+                <div class="text-center mb-8">
+                    <span class="text-4xl">🔮</span>
+                    <h2 class="font-bubble text-3xl md:text-5xl text-yellow-300 mt-2">
+                        Der Bikini Bottom Geschmackstest!
+                    </h2>
+                    <p class="text-blue-200 mt-2 text-base md:text-lg">
+                        Finde heraus, welcher legendäre Charakter und welches SpongeBob-Eis am besten zu deiner Persönlichkeit passt!
+                    </p>
+                </div>
+
+                <!-- Dynamic Quiz Content -->
+                <div id="quiz-container">
+                    <!-- Programmatically rendered step by step -->
+                </div>
+
+            </div>
+        </section>
+
+        <section id="bubble-game" class="py-20 px-4 md:px-12 bg-blue-950 relative z-10 border-t-8 border-yellow-400">
+            <div class="max-w-4xl mx-auto text-center space-y-8">
+                <div class="space-y-2">
+                    <span class="text-4xl">🧼</span>
+                    <h2 class="font-bubble text-3xl md:text-5xl text-yellow-300">
+                        Planktons Blasen-Abwehrspiel!
+                    </h2>
+                    <p class="text-blue-200 max-w-xl mx-auto">
+                        SpongeBob liebt Seifenblasen! Hilf ihm dabei, Planktons böse Spionage-Blasen zum Platzen zu bringen, indem du darauf klickst!
+                    </p>
+                </div>
+
+                <!-- Game Arena Box -->
+                <div id="game-arena" class="bg-gradient-to-b from-blue-900 to-sky-950 rounded-3xl h-96 relative overflow-hidden border-4 border-yellow-400 shadow-2xl flex items-center justify-center cursor-crosshair">
+                    <div class="absolute top-4 left-4 bg-blue-950/80 px-4 py-2 rounded-xl border border-blue-800 font-bubble">
+                        Geplatzte Blasen: <span id="game-score" class="text-yellow-400 font-bold">0</span>
+                    </div>
+
+                    <div class="absolute top-4 right-4 bg-blue-950/80 px-4 py-2 rounded-xl border border-blue-800 text-xs">
+                        Synthesizer Sound 🔊
+                    </div>
+
+                    <!-- Game completion modal -->
+                    <div id="game-win-overlay" class="hidden absolute inset-0 bg-blue-950/95 backdrop-blur-sm flex flex-col items-center justify-center p-6 space-y-4 z-20">
+                        <span class="text-5xl">🏆</span>
+                        <h3 class="font-bubble text-2xl text-yellow-400">Blasen-Meister freigeschaltet!</h3>
+                        <p class="text-blue-200 text-sm max-w-sm">
+                            Du hast über 10 Blasen zerplatzen lassen! Du bist nun bereit, das leckere Eis direkt zu bestellen.
+                        </p>
+                        <button id="reset-game-btn" class="bg-yellow-400 hover:bg-yellow-300 text-blue-950 font-bubble px-6 py-2.5 rounded-xl text-sm border-2 border-white transition-all">
+                            Weiterspielen
+                        </button>
+                    </div>
+
+                    <!-- Live floating bubbles inside arena -->
+                    <div id="game-bubbles-container" class="absolute inset-0 pointer-events-auto"></div>
+
+                    <div class="text-blue-300/40 select-none pointer-events-none text-xs absolute bottom-4">
+                        Tippe auf eine aufsteigende Seifenblase zum Platzen lassen!
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div id="cart-drawer" class="hidden fixed inset-0 z-50 bg-blue-950/85 backdrop-blur-md flex justify-end">
+            <div class="bg-blue-900 border-l-8 border-yellow-400 w-full max-w-md h-full flex flex-col justify-between p-6 shadow-2xl transition-all">
+                
+                <div>
+                    <!-- Cart Header -->
+                    <div class="flex justify-between items-center pb-4 border-b border-blue-800">
+                        <div class="flex items-center gap-2 text-yellow-400">
+                            <i class="fa-solid fa-ice-cream text-2xl"></i>
+                            <h3 class="font-bubble text-2xl">Deine Kühltruhe</h3>
+                        </div>
+                        <button id="close-cart-btn" class="text-white hover:text-red-500 text-2xl p-1">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+
+                    <!-- Dynamic list container -->
+                    <div id="cart-items-container" class="mt-6 space-y-4 overflow-y-auto max-h-[60vh] pr-1">
+                        <!-- Dynamic Cart Entries -->
+                    </div>
+                </div>
+
+                <!-- Checkout details and total pricing -->
+                <div id="cart-footer" class="border-t border-blue-800 pt-6 space-y-4">
+                    <!-- Dynamic footer totals -->
+                </div>
+
+            </div>
+        </div>
+
+        <div id="toast-container" class="fixed bottom-6 right-6 z-50 pointer-events-none"></div>
+
+        <footer class="bg-blue-950/90 border-t-8 border-yellow-400 py-12 px-4 md:px-12 text-center text-blue-200 z-10 relative">
+            <div class="max-w-7xl mx-auto space-y-6">
+                
+                <h3 class="font-bubble text-3xl text-yellow-400">
+                    Spongebob Schwammkopf Eis
+                </h3>
+                
+                <div class="flex flex-wrap justify-center gap-6 text-sm text-blue-300">
+                    <a href="https://t.adcell.com/p/click?encodingId=7ecc89d24e472bd0fe1f5785834e820a" target="_blank" class="hover:text-yellow-400 transition-colors">Offizieller Partnershop</a>
+                    <span>•</span>
+                    <a href="#" class="hover:text-yellow-400 transition-colors">Impressum</a>
+                    <span>•</span>
+                    <a href="#" class="hover:text-yellow-400 transition-colors">Datenschutz</a>
+                </div>
+
+                <div class="border-t border-blue-800/60 pt-6 max-w-3xl mx-auto text-xs space-y-4 text-blue-300">
+                    <!-- Zelo Digital Credit Notice -->
+                    <p class="font-semibold text-yellow-400/90">
+                        Diese Landingpage wurde mit viel Liebe zum Detail von <span class="underline">Zelo Digital</span> erstellt.
+                    </p>
+
+                    <!-- Affiliate Disclosure/Disclaimer -->
+                    <p class="leading-relaxed bg-blue-950/50 p-4 rounded-xl border border-blue-800/40">
+                        <strong class="text-white block mb-1">💡 Transparenzhinweis zu Affiliate-Links:</strong>
+                        Bei den Links auf dieser Seite handelt es sich teilweise um sogenannte Affiliate-Links (Partnerlinks). Wenn Sie über einen dieser Links eine Bestellung bei unserem zertifizierten Tiefkühlpartner PapaFrost aufgeben, erhalten wir eine kleine Vermittlungsprovision. Für Sie entstehen dabei selbstverständlich <strong>keinerlei Mehrkosten</strong> – Sie unterstützen damit lediglich die Bereitstellung dieses Informationsportals. Vielen Dank für Ihren Support!
+                    </p>
+
+                    <p class="text-xs text-blue-400 leading-relaxed">
+                        © 2026 Viacom International Inc. Alle Rechte vorbehalten. SpongeBob Schwammkopf erschaffen von Stephen Hillenburg. Vertrieben über Zeydler GmbH und den zertifizierten Tiefkühlpartner PapaFrost. Die gezeigten Preise verstehen sich inkl. MwSt. zzgl. möglicher Händlerversandkosten.
+                    </p>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- Adcell tracking pixel required for click analysis -->
+    <img src="https://t.adcell.com/p/view?promoId=454804&slotId=76195" border="0" width="1" height="1" alt="" class="hidden" />
+
+    <script>
+        // Ice Cream Catalog DB - All Umlauts in IDs removed/normalized to prevent routing issues
+        const iceCreams = [
+            {
+                id: "spongebob",
+                name: "SpongeBob",
+                flavor: "Vanille Mango",
+                price: 5.99,
+                size: "320 ml",
+                color: "from-yellow-400 to-amber-500",
+                textColor: "text-amber-950",
+                badgeColor: "bg-yellow-400 text-blue-900",
+                imageBg: "bg-yellow-100",
+                character: "SpongeBob Schwammkopf",
+                desc: "Cremiges Premium-Vanilleeis trifft auf ein fruchtig-süßes Mango-Sorbet. Der absolute Star der Krossen Krabbe, so sonnig und fröhlich wie der gelbe Schwamm selbst!",
+                ingredients: "Milch, Sahne, Zucker, Mangomark (12%), Vanille-Extrakt, Dextrose, Magermilchpulver, Guarkernmehl.",
+                nutrition: { cal: "148 kcal", fat: "4.8g", carbs: "22g", sugar: "19g", protein: "2.1g", salt: "0.08g" },
+                emoji: "🍍",
+                accentColor: "#FBBF24",
+                imageUrl: "https://www.papafrost.de/cdn-cgi/image/w%3D3000%2Cq%3D80%2Cf%3Dauto/media/ee/94/30/1768998495/101003_HD_1_Spongebob-Eis_Spongebob-Vanille-Mango_Zeydler.jpg?t=1768998495"
+            },
+            {
+                id: "patrick",
+                name: "Patrick Star",
+                flavor: "Erdbeer Drachenfrucht",
+                price: 5.99,
+                size: "320 ml",
+                color: "from-pink-400 to-rose-500",
+                textColor: "text-rose-950",
+                badgeColor: "bg-pink-400 text-white",
+                imageBg: "bg-pink-100",
+                character: "Patrick Star",
+                desc: "Das zweifarbige, absolut geniale Sorbet-Vergnügen! Saftig-süße Erdbeere verzaubert harmonisch vereint mit der exotischen Drachenfrucht. 100% vegan und herrlich erfrischend!",
+                ingredients: "Erdbeersorbet (Erdbeerpüree 24%, Wasser, Zucker, Inulin), Drachenfruchtsorbet (Drachenfruchtpüree 24%, Säuerungsmittel: Zitronensäure, Guarkernmehl).",
+                nutrition: { cal: "74 kcal", fat: "0.1g", carbs: "18g", sugar: "15g", protein: "0.3g", salt: "0g" },
+                emoji: "⭐",
+                accentColor: "#F43F5E",
+                imageUrl: "https://www.papafrost.de/cdn-cgi/image/w%3D3000%2Cq%3D80%2Cf%3Dauto/media/56/8c/77/1768998490/100998_HD_1_Spongebob-Eis_Patrick-Erdbeer-Drachenfrucht_Zeydler.jpg?t=1768998490"
+            },
+            {
+                id: "thaddaeus",
+                name: "Thaddäus",
+                flavor: "Waldmeister Brause",
+                price: 5.99,
+                size: "320 ml",
+                color: "from-teal-400 to-emerald-500",
+                textColor: "text-emerald-950",
+                badgeColor: "bg-teal-400 text-blue-900",
+                imageBg: "bg-teal-100",
+                character: "Thaddäus Tentakel",
+                desc: "Erfrischender, nostalgischer Waldmeister-Geschmack kombiniert mit prickelnder Brause. Bringt garantiert selbst den mürrischsten Tintenfisch zum Schmelzen!",
+                ingredients: "Wasser, Zucker, Waldmeister-Extrakt, Brausegranulat (Zitronensäure, Natron), natürliches Aroma, Färberdistel-Konzentrat.",
+                nutrition: { cal: "82 kcal", fat: "0g", carbs: "20g", sugar: "18g", protein: "0.1g", salt: "0.02g" },
+                emoji: "🐙",
+                accentColor: "#0D9488",
+                imageUrl: "https://www.papafrost.de/cdn-cgi/image/w%3D3000%2Cq%3D80%2Cf%3Dauto/media/3f/ae/36/1768998494/101002_HD_1_Spongebob-Eis_Thaddaeus-Waldmeister-Brause_Zeydler.jpg?t=1768998494"
+            },
+            {
+                id: "gary",
+                name: "Gary",
+                flavor: "Cookie",
+                price: 5.99,
+                size: "320 ml",
+                color: "from-blue-400 to-indigo-500",
+                textColor: "text-indigo-950",
+                badgeColor: "bg-blue-400 text-white",
+                imageBg: "bg-blue-100",
+                character: "Gary die Schnecke",
+                desc: "Feinstes, super cremiges Milcheis mit echten, knackigen Keksstückchen und einem Hauch von Karamell. Zum Dahinschmelzen – Miau!",
+                ingredients: "Milch, Keksstücke 10% (Weizenmehl, Butter, Kakaomasse, Zucker), Karamell-Swirl, Inulin, Bourbon-Vanille.",
+                nutrition: { cal: "192 kcal", fat: "8.2g", carbs: "26g", sugar: "21g", protein: "3.2g", salt: "0.12g" },
+                emoji: "🐌",
+                accentColor: "#3B82F6",
+                imageUrl: "https://www.papafrost.de/cdn-cgi/image/w%3D3000%2Cq%3D80%2Cf%3Dauto/media/fc/13/50/1768998492/101000_HD_1_Spongebob-Eis_Gary-Cookie_Zeydler.jpg?t=1768998492"
+            },
+            {
+                id: "mrkrabs",
+                name: "Mr. Krabs",
+                flavor: "Spaghetti-Eis Style",
+                price: 5.99,
+                size: "320 ml",
+                color: "from-red-500 to-rose-700",
+                textColor: "text-rose-950",
+                badgeColor: "bg-red-500 text-white",
+                imageBg: "bg-red-100",
+                character: "Mr. Krabs",
+                desc: "Der krasse Eisbecher für Sparfüchse! Klassisches Spaghetti-Eis im Becher: Cremiges Vanilleeis verfeinert mit edler Erdbeersauce und weißen Raspelschokoladenstücken.",
+                ingredients: "Vollmilch, Sahne, Zucker, Erdbeersauce 6%, Raspelschokolade weiß (Kakaobutter, Vollmilchpulver, Zucker), Vanilleschoten-Extrakt.",
+                nutrition: { cal: "186 kcal", fat: "8.3g", carbs: "24.2g", sugar: "22.9g", protein: "3.4g", salt: "0.15g" },
+                emoji: "🦀",
+                accentColor: "#E11D48",
+                imageUrl: "https://www.papafrost.de/cdn-cgi/image/w%3D3000%2Cq%3D80%2Cf%3Dauto/media/ee/00/36/1768998491/100999_HD_1_Spongebob-Eis_Mr.-Krabs-Spaghetti_Zeydler.jpg?t=1768998491"
+            },
+            {
+                id: "hollaender",
+                name: "Fliegender Holländer",
+                flavor: "Geister-Stracciatella",
+                price: 5.99,
+                size: "320 ml",
+                color: "from-slate-600 to-zinc-800",
+                textColor: "text-zinc-100",
+                badgeColor: "bg-zinc-700 text-yellow-300",
+                imageBg: "bg-slate-300",
+                character: "Der Fliegende Holländer",
+                desc: "Gruselig leckeres, extra-cremiges Stracciatella-Eis gespickt mit feinsten dunklen Schokoladensplittern. Spukhaft gut!",
+                ingredients: "Milch, Sahne, Zucker, Bitterschokoladensplitter 8% (Kakaomasse, Rohrzucker), Inulin, natürliche Bourbon-Vanille.",
+                nutrition: { cal: "179 kcal", fat: "7.9g", carbs: "23g", sugar: "20g", protein: "2.9g", salt: "0.1g" },
+                emoji: "🏴‍☠️",
+                accentColor: "#4B5563",
+                imageUrl: "https://www.papafrost.de/cdn-cgi/image/w%3D3000%2Cq%3D80%2Cf%3Dauto/media/f4/8f/6f/1768998493/101001_HD_1_Spongebob-Eis_Fliegender-Hollaender-Stracciatella_Zeydler.jpg?t=1768998493"
+            }
+        ];
+
+        // Quiz Database structure
+        const quizQuestions = [
+            {
+                question: "Wie verbringst du am liebsten deinen freien Sonntag?",
+                options: [
+                    { text: "Quatsch machen und Abenteuer erleben!", value: "spongebob" },
+                    { text: "Einfach chillen, schlafen und nichts tun.", value: "patrick" },
+                    { text: "Klarinette spielen, malen oder Ruhe genießen.", value: "thaddaeus" },
+                    { text: "Zählen... also mein Geld oder meine Sammlung!", value: "mrkrabs" }
+                ]
+            },
+            {
+                question: "Was ist dein absolutes Lieblingselement in einer Speise?",
+                options: [
+                    { text: "Fruchtig, tropisch und knallig süß", value: "spongebob" },
+                    { text: "Exotisch und beerig (Drachenfrucht!)", value: "patrick" },
+                    { text: "Sauer und prickelnd wie Brause", value: "thaddaeus" },
+                    { text: "Cremiges Gebäck und süße Keksstückchen", value: "gary" }
+                ]
+            },
+            {
+                question: "Wie reagierst du, wenn Plankton die Geheimformel stehlen will?",
+                options: [
+                    { text: "Ich verteidige sie mit Karate und Karate-Koteletts!", value: "spongebob" },
+                    { text: "Hä? Wer ist Plankton? Ist das essbar?", value: "patrick" },
+                    { text: "Mir egal, Hauptsache ich muss nicht arbeiten.", value: "thaddaeus" },
+                    { text: "ALARM! Schließt alle Pforten, meine kostbaren Taler!", value: "mrkrabs" }
+                ]
+            }
+        ];
+
+        let state = {
+            cart: [],
+            selectedIce: null,
+            activeTab: 'details',
+            quizStep: 0,
+            quizAnswers: [],
+            quizResult: null,
+            audioEnabled: true,
+            bubbleScore: 0,
+            affiliateLink: "https://t.adcell.com/p/click?encodingId=7ecc89d24e472bd0fe1f5785834e820a"
+        };
+
+        const playPopSound = () => {
+            if (!state.audioEnabled) return;
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(140, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1000, ctx.currentTime + 0.12);
+                
+                gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.12);
+                
+                osc.start();
+                osc.stop(ctx.currentTime + 0.12);
+            } catch (e) {
+                console.log("AudioContext blocked or failed to initialize.");
+            }
+        };
+
+        const triggerToast = (msg) => {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = "mb-3 bg-yellow-400 text-blue-950 px-6 py-4 rounded-2xl font-bubble shadow-2xl flex items-center gap-3 border-4 border-white animate-bounce pointer-events-auto transition-all duration-300 opacity-100";
+            toast.innerHTML = `
+                <i class="fa-solid fa-ice-cream text-2xl"></i>
+                <span class="font-semibold">${msg}</span>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        };
+
+        // Clipboard function specifically for iframes
+        const copyVoucherCode = () => {
+            const tempInput = document.createElement("input");
+            tempInput.value = "BVEALICRGF";
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            triggerToast("Gutscheincode kopiert: BVEALICRGF ✂️");
+        };
+
+        const generateBackgroundBubbles = () => {
+            const container = document.getElementById('bubble-bg');
+            container.innerHTML = '';
+            for (let i = 0; i < 15; i++) {
+                const bubble = document.createElement('div');
+                const left = Math.random() * 95;
+                const delay = Math.random() * 8;
+                const duration = 6 + Math.random() * 8;
+                const size = 20 + Math.random() * 40;
+                
+                bubble.className = "bubble-element absolute rounded-full bg-white/10 border border-white/20";
+                bubble.style.left = `${left}%`;
+                bubble.style.animationDelay = `${delay}s`;
+                bubble.style.animationDuration = `${duration}s`;
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                container.appendChild(bubble);
+            }
+        };
+
+        const initCountdownTimer = () => {
+            const targetTime = new Date("Oct 31, 2026 23:59:00").getTime();
+
+            const updateTimer = () => {
+                const now = new Date().getTime();
+                const difference = targetTime - now;
+
+                if (difference <= 0) {
+                    document.getElementById("timer-days").textContent = "00";
+                    document.getElementById("timer-hours").textContent = "00";
+                    document.getElementById("timer-minutes").textContent = "00";
+                    document.getElementById("timer-seconds").textContent = "00";
+                    return;
+                }
+
+                const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+                document.getElementById("timer-days").textContent = days.toString().padStart(2, "0");
+                document.getElementById("timer-hours").textContent = hours.toString().padStart(2, "0");
+                document.getElementById("timer-minutes").textContent = minutes.toString().padStart(2, "0");
+                document.getElementById("timer-seconds").textContent = seconds.toString().padStart(2, "0");
+            };
+
+            updateTimer();
+            setInterval(updateTimer, 1000);
+        };
+
+        const addToCart = (iceId) => {
+            playPopSound();
+            const ice = iceCreams.find(i => i.id === iceId);
+            if (!ice) return;
+
+            const existing = state.cart.find(item => item.id === iceId);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                state.cart.push({ ...ice, qty: 1 });
+            }
+            triggerToast(`${ice.name} (${ice.flavor}) hinzugefügt! 🍦`);
+            updateCartBadge();
+            renderCart();
+        };
+
+        const updateCartQty = (iceId, delta) => {
+            playPopSound();
+            const item = state.cart.find(i => i.id === iceId);
+            if (!item) return;
+
+            item.qty += delta;
+            if (item.qty <= 0) {
+                state.cart = state.cart.filter(i => i.id !== iceId);
+            }
+            updateCartBadge();
+            renderCart();
+        };
+
+        const updateCartBadge = () => {
+            const badge = document.getElementById('cart-badge');
+            const totalQty = state.cart.reduce((sum, item) => sum + item.qty, 0);
+            if (totalQty > 0) {
+                badge.textContent = totalQty;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        };
+
+        const renderProductGrid = () => {
+            const grid = document.getElementById('ice-creams-grid');
+            grid.innerHTML = iceCreams.map(ice => `
+                <div onclick="openProductDetail('${ice.id}')" class="bg-blue-900/40 rounded-3xl p-6 border-4 border-blue-800 hover:border-yellow-400 transition-all transform hover:-translate-y-2 cursor-pointer relative group flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="px-4 py-1.5 rounded-full font-bubble text-xs font-bold uppercase tracking-wider shadow ${ice.badgeColor}">
+                                ${ice.size}
+                            </span>
+                            <span class="text-2xl">${ice.emoji}</span>
+                        </div>
+
+                        <!-- Real Product Becher view -->
+                        <div class="w-full h-56 flex items-center justify-center mb-6 relative">
+                            <div class="absolute inset-0 bg-blue-500/10 blur-xl rounded-full"></div>
+                            <img src="${ice.imageUrl}" 
+                                 alt="${ice.name} - ${ice.flavor}" 
+                                 class="max-h-full object-contain drop-shadow-[0_15px_15px_rgba(0,0,0,0.4)] group-hover:scale-105 group-hover:rotate-3 transition-transform duration-300">
+                        </div>
+
+                        <div class="text-center space-y-2">
+                            <h3 class="font-bubble text-2xl text-white group-hover:text-yellow-400 transition-colors">
+                                SpongeBob Eis – ${ice.name}
+                            </h3>
+                            <p class="text-sky-300 font-bubble text-lg font-medium">${ice.flavor}</p>
+                            <p class="text-blue-200 text-sm line-clamp-2 px-2">${ice.desc}</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-blue-800/60 flex items-center justify-between">
+                        <div class="text-left">
+                            <span class="text-xs text-blue-300 block">Preis pro Becher</span>
+                            <span class="font-bubble text-2xl text-yellow-400">${ice.price.toFixed(2)} €</span>
+                        </div>
+                        <button onclick="event.stopPropagation(); addToCart('${ice.id}');" class="bg-yellow-400 hover:bg-yellow-300 text-blue-950 font-bubble px-5 py-2.5 rounded-2xl shadow border border-white flex items-center gap-2 transform active:scale-95 transition-all">
+                            <i class="fa-solid fa-plus text-sm"></i>
+                            <span>Löffeln!</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        };
+
+        const openProductDetail = (iceId) => {
+            playPopSound();
+            const ice = iceCreams.find(i => i.id === iceId);
+            if (!ice) return;
+            state.selectedIce = ice;
+            state.activeTab = 'details';
+            renderDetailModal();
+            document.getElementById('product-modal').classList.remove('hidden');
+        };
+
+        const closeProductDetail = () => {
+            playPopSound();
+            state.selectedIce = null;
+            document.getElementById('product-modal').classList.add('hidden');
+        };
+
+        const setDetailTab = (tabName) => {
+            playPopSound();
+            state.activeTab = tabName;
+            renderDetailModal();
+        };
+
+        const renderDetailModal = () => {
+            const ice = state.selectedIce;
+            if (!ice) return;
+            const modal = document.getElementById('product-modal');
+
+            let tabContent = '';
+            if (state.activeTab === 'details') {
+                tabContent = `
+                    <div class="space-y-4">
+                        <h4 class="text-xl font-bold font-bubble text-yellow-400">Das Sensationseis:</h4>
+                        <p class="text-blue-100 leading-relaxed text-sm">${ice.desc}</p>
+                        <div class="p-3 bg-blue-950 rounded-xl border border-blue-800 text-xs text-blue-300">
+                            <i class="fa-solid fa-circle-info text-yellow-400 mr-2"></i>
+                            Dieses fantastische Eis fängt den Charakter von <strong>${ice.character}</strong> hervorragend ein.
+                        </div>
+                    </div>
+                `;
+            } else if (state.activeTab === 'ingredients') {
+                tabContent = `
+                    <div class="space-y-4">
+                        <h4 class="text-xl font-bold font-bubble text-yellow-400">Feinste Zutaten:</h4>
+                        <p class="text-blue-100 leading-relaxed text-sm bg-blue-950 p-4 rounded-xl border border-blue-800">${ice.ingredients}</p>
+                        <p class="text-xs text-blue-300 italic">Kann Spuren von Soja, Milch, Ei, Schalenfrüchten und glutenhaltigem Getreide enthalten.</p>
+                    </div>
+                `;
+            } else if (state.activeTab === 'nutrition') {
+                tabContent = `
+                    <div class="space-y-4">
+                        <h4 class="text-xl font-bold font-bubble text-yellow-400">Nährwerte (je 100g):</h4>
+                        <div class="grid grid-cols-2 gap-2 text-sm text-white">
+                            <div class="bg-blue-950 p-2 rounded-lg flex justify-between">
+                                <span class="text-blue-300">Energie:</span>
+                                <span class="font-bold">${ice.nutrition.cal}</span>
+                            </div>
+                            <div class="bg-blue-950 p-2 rounded-lg flex justify-between">
+                                <span class="text-blue-300">Fett:</span>
+                                <span class="font-bold">${ice.nutrition.fat}</span>
+                            </div>
+                            <div class="bg-blue-950 p-2 rounded-lg flex justify-between">
+                                <span class="text-blue-300">Carbs:</span>
+                                <span class="font-bold">${ice.nutrition.carbs}</span>
+                            </div>
+                            <div class="bg-blue-950 p-2 rounded-lg flex justify-between">
+                                <span class="text-blue-300">Zucker:</span>
+                                <span class="font-bold">${ice.nutrition.sugar}</span>
+                            </div>
+                            <div class="bg-blue-950 p-2 rounded-lg flex justify-between col-span-2">
+                                <span class="text-blue-300">Eiweiß:</span>
+                                <span class="font-bold">${ice.nutrition.protein}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            modal.innerHTML = `
+                <div class="bg-blue-900 border-8 border-yellow-400 rounded-3xl w-full max-w-3xl overflow-hidden shadow-2xl relative animate-in zoom-in-95 duration-200">
+                    <button onclick="closeProductDetail()" class="absolute top-4 right-4 bg-red-600 hover:bg-red-500 text-white w-10 h-10 rounded-full flex items-center justify-center border-2 border-white shadow z-10 transition-transform active:scale-95">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2">
+                        <!-- Left colored block with High-Res Image -->
+                        <div class="p-8 bg-gradient-to-br ${ice.color} flex flex-col justify-center items-center text-center relative overflow-hidden">
+                            <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/20 to-transparent"></div>
+                            
+                            <img src="${ice.imageUrl}" 
+                                 alt="${ice.name}" 
+                                 class="w-56 object-contain drop-shadow-[0_20px_20px_rgba(0,0,0,0.45)] animate-bounce mb-4 relative z-10">
+
+                            <h3 class="font-bubble text-4xl text-blue-950 drop-shadow-sm mb-1">${ice.name}</h3>
+                            <p class="font-bubble bg-blue-950 text-white px-4 py-1 rounded-full text-sm inline-block">${ice.flavor}</p>
+                            <div class="mt-6 bg-white/20 backdrop-blur-sm rounded-2xl p-3 text-blue-950 border border-white/30 text-xs font-semibold max-w-[200px]">
+                                <p>${ice.size} Genussbecher</p>
+                                <p class="text-[10px] opacity-80">Zeydler GmbH Lizenz</p>
+                            </div>
+                        </div>
+
+                        <!-- Right interactive details block -->
+                        <div class="p-8 flex flex-col justify-between bg-blue-900 text-white">
+                            <div>
+                                <div class="flex gap-2 border-b border-blue-800 pb-3 mb-4">
+                                    <button onclick="setDetailTab('details')" class="px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider font-bubble transition-colors ${state.activeTab === 'details' ? 'bg-yellow-400 text-blue-950' : 'bg-blue-950 text-blue-300 hover:bg-blue-800'}">Details</button>
+                                    <button onclick="setDetailTab('ingredients')" class="px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider font-bubble transition-colors ${state.activeTab === 'ingredients' ? 'bg-yellow-400 text-blue-950' : 'bg-blue-950 text-blue-300 hover:bg-blue-800'}">Zutaten</button>
+                                    <button onclick="setDetailTab('nutrition')" class="px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider font-bubble transition-colors ${state.activeTab === 'nutrition' ? 'bg-yellow-400 text-blue-950' : 'bg-blue-950 text-blue-300 hover:bg-blue-800'}">Nährwerte</button>
+                                </div>
+                                <div id="tab-content-render-area">${tabContent}</div>
+                            </div>
+
+                            <div class="mt-8 pt-4 border-t border-blue-800 flex items-center justify-between">
+                                <div>
+                                    <span class="text-xs text-blue-300 block">Einzelpreis</span>
+                                    <span class="font-bubble text-3xl text-yellow-400">${ice.price.toFixed(2)} €</span>
+                                </div>
+                                <button onclick="addToCart('${ice.id}'); closeProductDetail();" class="bg-yellow-400 hover:bg-yellow-300 text-blue-950 font-bubble px-6 py-3 rounded-2xl border-b-4 border-yellow-600 flex items-center gap-2 transform active:scale-95">
+                                    <i class="fa-solid fa-cart-plus"></i>
+                                    <span>Einpacken</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        };
+
+        const handleQuizChoice = (choiceVal) => {
+            playPopSound();
+            state.quizAnswers.push(choiceVal);
+
+            if (state.quizStep + 1 < quizQuestions.length) {
+                state.quizStep += 1;
+                renderQuiz();
+            } else {
+                // Calculate answer with greatest occurrences
+                const counts = {};
+                let matchedVal = state.quizAnswers[0];
+                let maxCount = 0;
+
+                state.quizAnswers.forEach(ans => {
+                    counts[ans] = (counts[ans] || 0) + 1;
+                    if (counts[ans] > maxCount) {
+                        maxCount = counts[ans];
+                        matchedVal = ans;
+                    }
+                });
+
+                state.quizResult = iceCreams.find(ice => ice.id === matchedVal) || iceCreams[0];
+                renderQuiz();
+            }
+        };
+
+        const resetQuiz = () => {
+            playPopSound();
+            state.quizStep = 0;
+            state.quizAnswers = [];
+            state.quizResult = null;
+            renderQuiz();
+        };
+
+        const renderQuiz = () => {
+            const container = document.getElementById('quiz-container');
+            if (!state.quizResult) {
+                const q = quizQuestions[state.quizStep];
+                container.innerHTML = `
+                    <div class="space-y-6 animate-in fade-in duration-300">
+                        <div class="bg-blue-950 p-6 rounded-2xl border-2 border-blue-800 text-center">
+                            <span class="text-yellow-400 font-bubble text-sm tracking-wider uppercase block mb-1">
+                                Frage ${state.quizStep + 1} von ${quizQuestions.length}
+                            </span>
+                            <h3 class="font-bubble text-xl md:text-2xl text-white">${q.question}</h3>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            ${q.options.map(opt => `
+                                <button onclick="handleQuizChoice('${opt.value}')" class="bg-blue-800/40 hover:bg-yellow-400 hover:text-blue-950 p-4 rounded-xl border border-blue-700 hover:border-white transition-all text-left font-medium text-sm md:text-base flex items-center justify-between group active:scale-95">
+                                    <span>${opt.text}</span>
+                                    <i class="fa-solid fa-circle-arrow-right opacity-0 group-hover:opacity-100 transition-opacity ml-2"></i>
+                                </button>
+                            `).join('')}
+                        </div>
+
+                        <!-- Progress Bar indicator -->
+                        <div class="w-full bg-blue-950 h-3 rounded-full overflow-hidden">
+                            <div class="bg-yellow-400 h-full transition-all duration-300" style="width: ${((state.quizStep) / quizQuestions.length) * 100}%"></div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="text-center p-6 space-y-6 animate-in zoom-in-95 duration-300">
+                        <div class="inline-block bg-yellow-400 text-blue-950 font-bubble px-6 py-2 rounded-full text-lg border-2 border-white">
+                            Dein optimaler Match! 🎉
+                        </div>
+
+                        <div class="flex flex-col items-center">
+                            <img src="${state.quizResult.imageUrl}" 
+                                 alt="${state.quizResult.name}" 
+                                 class="w-48 object-contain drop-shadow-[0_15px_15px_rgba(0,0,0,0.4)] animate-bounce mb-2">
+                            <h3 class="font-bubble text-3xl md:text-4xl text-yellow-300">Sorte: ${state.quizResult.name}</h3>
+                            <p class="font-bubble text-xl text-sky-300">(${state.quizResult.flavor})</p>
+                        </div>
+
+                        <p class="text-blue-100 max-w-xl mx-auto leading-relaxed text-sm md:text-base bg-blue-950 p-6 rounded-2xl border border-blue-800">
+                            Du teilst dir denselben phänomenalen Geschmack mit <strong>${state.quizResult.character}</strong>! ${state.quizResult.desc}
+                        </p>
+
+                        <div class="flex flex-wrap justify-center gap-4">
+                            <button onclick="addToCart('${state.quizResult.id}')" class="bg-yellow-400 hover:bg-yellow-300 text-blue-950 font-bubble text-lg px-6 py-3 rounded-2xl shadow border border-white flex items-center gap-2 transform active:scale-95 transition-all">
+                                <i class="fa-solid fa-cart-plus"></i>
+                                <span>Sorte einpacken</span>
+                            </button>
+                            <button onclick="resetQuiz()" class="bg-transparent hover:bg-white/10 text-white font-bubble text-lg px-6 py-3 rounded-2xl border-2 border-blue-700 transition-colors">
+                                <i class="fa-solid fa-rotate-left mr-2"></i>
+                                <span>Nochmal spielen</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+        };
+
+        let gameInterval = null;
+
+        const spawnGameBubble = () => {
+            const container = document.getElementById('game-bubbles-container');
+            if (!container) return;
+
+            const bubble = document.createElement('div');
+            const size = 50 + Math.random() * 40;
+            const startX = Math.random() * (container.clientWidth - size);
+            let posY = container.clientHeight;
+            const speed = 2.5 + Math.random() * 3;
+
+            bubble.className = "bubble-game-item absolute rounded-full bg-white/10 border-2 border-white/40 shadow-[inset_0_4px_12px_rgba(255,255,255,0.4)] flex items-center justify-center cursor-pointer select-none text-[10px] text-white/60 font-bubble";
+            bubble.style.width = `${size}px`;
+            bubble.style.height = `${size}px`;
+            bubble.style.left = `${startX}px`;
+            bubble.style.top = `${posY}px`;
+            bubble.textContent = "POP!";
+
+            // Bubble Tap / Click Pop execution
+            bubble.addEventListener('click', (e) => {
+                e.stopPropagation();
+                playPopSound();
+                state.bubbleScore += 1;
+                document.getElementById('game-score').textContent = state.bubbleScore;
+
+                // Win Game state trigger
+                if (state.bubbleScore >= 10) {
+                    document.getElementById('game-win-overlay').classList.remove('hidden');
+                }
+                bubble.remove();
+            });
+
+            container.appendChild(bubble);
+
+            // Upward Floating Tick interval
+            const floatInterval = setInterval(() => {
+                posY -= speed;
+                bubble.style.top = `${posY}px`;
+
+                if (posY < -100) {
+                    clearInterval(floatInterval);
+                    bubble.remove();
+                }
+            }, 30);
+
+            // Clear timer if element removed
+            bubble.dataset.timerId = floatInterval;
+        };
+
+        const startGameEngine = () => {
+            if (gameInterval) clearInterval(gameInterval);
+            gameInterval = setInterval(() => {
+                if (state.bubbleScore < 10) {
+                    spawnGameBubble();
+                }
+            }, 1200);
+        };
+
+        const resetGame = () => {
+            playPopSound();
+            state.bubbleScore = 0;
+            document.getElementById('game-score').textContent = "0";
+            document.getElementById('game-win-overlay').classList.add('hidden');
+            const container = document.getElementById('game-bubbles-container');
+            container.innerHTML = '';
+        };
+
+        const renderCart = () => {
+            const container = document.getElementById('cart-items-container');
+            const footer = document.getElementById('cart-footer');
+
+            if (state.cart.length === 0) {
+                container.innerHTML = `
+                    <div class="py-20 text-center space-y-4">
+                        <span class="text-6xl block">💨</span>
+                        <p class="font-bubble text-xl text-blue-200">Deine Kühltruhe ist leer!</p>
+                        <p class="text-xs text-blue-300 px-8">Packe ein paar der leckeren Sorten in deine Truhe!</p>
+                    </div>
+                `;
+                footer.innerHTML = '';
+                return;
+            }
+
+            // Render list entries
+            container.innerHTML = state.cart.map(item => `
+                <div class="bg-blue-950/60 p-4 rounded-2xl border border-blue-800 flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl">${item.emoji}</span>
+                        <div>
+                            <h4 class="font-bold text-sm text-yellow-400">${item.name}</h4>
+                            <p class="text-xs text-blue-200">${item.flavor}</p>
+                            <p class="text-xs text-blue-400 mt-1">${item.price.toFixed(2)} € / Becher</p>
+                        </div>
+                    </div>
+
+                    <!-- Quantity controllers -->
+                    <div class="flex items-center gap-3">
+                        <button onclick="updateCartQty('${item.id}', -1)" class="w-8 h-8 rounded-full bg-blue-900 hover:bg-red-600 text-white flex items-center justify-center border border-blue-700 text-sm font-bold transition-all">-</button>
+                        <span class="font-bubble text-lg w-4 text-center">${item.qty}</span>
+                        <button onclick="updateCartQty('${item.id}', 1)" class="w-8 h-8 rounded-full bg-blue-900 hover:bg-emerald-600 text-white flex items-center justify-center border border-blue-700 text-sm font-bold transition-all">+</button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Calculate overall sum
+            const sum = state.cart.reduce((acc, curr) => acc + (curr.price * curr.qty), 0);
+            
+            footer.innerHTML = `
+                <div class="space-y-2">
+                    <div class="flex justify-between text-blue-200 text-sm">
+                        <span>Zwischensumme:</span>
+                        <span>${sum.toFixed(2)} €</span>
+                    </div>
+                    <div class="flex justify-between text-blue-200 text-sm">
+                        <span>Versand (TK-Express):</span>
+                        <span class="text-emerald-400 font-semibold">Gratis ab 79€</span>
+                    </div>
+                    <div class="flex justify-between text-yellow-400 font-bubble text-2xl pt-2 border-t border-blue-800/40">
+                        <span>Gesamtpreis:</span>
+                        <span>${sum.toFixed(2)} €</span>
+                    </div>
+                </div>
+
+                <div class="text-[11px] text-blue-300 bg-blue-950 p-3 rounded-xl border border-blue-800 leading-tight space-y-1">
+                    <p class="flex items-center gap-1.5 font-semibold text-yellow-400">
+                        <i class="fa-solid fa-lock text-yellow-400"></i>
+                        Sichere Weiterleitung
+                    </p>
+                    <p>
+                        Du wirst zur offiziellen Partner-Bestellseite von <strong>PapaFrost / Zeydler</strong> weitergeleitet, um den zertifizierten Kühlversand sicher abzuschließen.
+                    </p>
+                </div>
+
+                <a href="${state.affiliateLink}" target="_blank" rel="noopener noreferrer" class="w-full bg-yellow-400 hover:bg-yellow-300 text-blue-950 font-bubble text-center py-4 rounded-2xl border-b-4 border-yellow-600 shadow-xl transition-all block text-lg active:scale-95">
+                    🚀 Jetzt bei PapaFrost bestellen
+                </a>
+            `;
+        };
+
+        window.onload = function() {
+            // Setup static layouts
+            generateBackgroundBubbles();
+            renderProductGrid();
+            renderQuiz();
+            renderCart();
+            startGameEngine();
+            initCountdownTimer();
+
+            // Audio control click event
+            document.getElementById('audio-toggle-btn').addEventListener('click', () => {
+                state.audioEnabled = !state.audioEnabled;
+                const icon = document.getElementById('audio-icon');
+                if (state.audioEnabled) {
+                    icon.className = "fa-solid fa-volume-high text-xl";
+                    triggerToast("Sounds aktiviert! 🔊");
+                    playPopSound();
+                } else {
+                    icon.className = "fa-solid fa-volume-xmark text-xl";
+                    triggerToast("Stummgeschaltet 🔇");
+                }
+            });
+
+            // Cart drawers controllers
+            document.getElementById('cart-toggle-btn').addEventListener('click', () => {
+                playPopSound();
+                document.getElementById('cart-drawer').classList.remove('hidden');
+            });
+            document.getElementById('close-cart-btn').addEventListener('click', () => {
+                playPopSound();
+                document.getElementById('cart-drawer').classList.add('hidden');
+            });
+
+            // Reset game btn trigger
+            document.getElementById('reset-game-btn').addEventListener('click', resetGame);
+        };
+    </script>
+</body>
+</html>
