@@ -6,12 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bikini Bottom Eisparadies – Das neue SpongeBob Eis</title>
     
+    <!-- Loading Tailwind CSS Framework -->
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
@@ -100,8 +103,8 @@
 
                 <nav class="hidden md:flex items-center gap-8 font-bubble text-lg">
                     <a href="#sorten" class="text-white hover:text-yellow-400 transition-colors drop-shadow">🍨 Sorten</a>
-                    <a href="#quiz" class="text-white hover:text-yellow-400 transition-colors drop-shadow">🧠 Sorte finden</a>
-                    <a href="#bubble-game" class="text-white hover:text-yellow-400 transition-colors drop-shadow">🧼 Blubberspiel</a>
+                    <a href="#quiz" class="text-white hover:text-yellow-400 transition-colors drop-shadow">🔍 Sorte finden</a>
+                    <a href="#bubble-game" class="text-white hover:text-yellow-400 transition-colors drop-shadow">💧 Blubberspiel</a>
                 </nav>
 
                 <div class="flex items-center gap-4">
@@ -122,7 +125,8 @@
             <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-4">
                 <div class="flex flex-wrap items-center justify-center lg:justify-start gap-3 text-center lg:text-left">
                     <span class="bg-blue-950 text-yellow-400 text-xs font-bold uppercase px-3 py-1 rounded-full animate-pulse border border-white">DEAL!</span>
-                    <a href="https://t.adcell.com/p/click?encodingId=7ecc89d24e472bd0fe1f5785834e820a" target="_blank" class="font-bubble text-base md:text-lg font-bold hover:underline flex items-center gap-2">
+                    <!-- Updated Affiliate Link pointing to the new promo/slot parameters -->
+                    <a href="https://t.adcell.com/p/click?promoId=454804&slotId=76195&param0=https%3A%2F%2Fwww.papafrost.de%2Fsearch%3Fsearch%3Dspongebob" target="_blank" class="font-bubble text-base md:text-lg font-bold hover:underline flex items-center gap-2">
                         🎉 5% Rabatt auf alle SpongeBob Eissorten!
                         <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
                     </a>
@@ -148,7 +152,8 @@
                     </div>
                 </div>
             </div>
-            <img src="https://t.adcell.com/p/view?encodingId=7ecc89d24e472bd0fe1f5785834e820a" border="0" width="1" height="1" alt="" class="hidden" />
+            <!-- Updated Tracking Pixel View matching the promo/slot configuration -->
+            <img src="https://t.adcell.com/p/view?promoId=454804&slotId=76195" border="0" width="1" height="1" alt="" class="hidden" />
         </div>
 
         <div class="w-full bg-blue-950 relative overflow-hidden">
@@ -178,7 +183,8 @@
                         <a href="#sorten" class="bg-yellow-400 hover:bg-yellow-300 text-blue-950 font-bubble text-lg md:text-xl px-6 md:px-8 py-3 md:py-4 rounded-2xl border-b-4 border-yellow-600 shadow-xl transition-all transform hover:-translate-y-1 inline-block">
                             🧁 Jetzt Sorten entdecken
                         </a>
-                        <a href="https://t.adcell.com/p/click?encodingId=7ecc89d24e472bd0fe1f5785834e820a" target="_blank" rel="noopener noreferrer" class="bg-blue-900 hover:bg-blue-800 text-white font-bubble text-lg md:text-xl px-6 md:px-8 py-3 md:py-4 rounded-2xl border-4 border-dashed border-yellow-400 shadow-xl transition-all inline-block">
+                        <!-- Updated Affiliate Link pointing to the new promo/slot parameters -->
+                        <a href="https://t.adcell.com/p/click?promoId=454804&slotId=76195&param0=https%3A%2F%2Fwww.papafrost.de%2Fsearch%3Fsearch%3Dspongebob" target="_blank" rel="noopener noreferrer" class="bg-blue-900 hover:bg-blue-800 text-white font-bubble text-lg md:text-xl px-6 md:px-8 py-3 md:py-4 rounded-2xl border-4 border-dashed border-yellow-400 shadow-xl transition-all inline-block">
                             🛒 5% Deal sichern
                         </a>
                     </div>
@@ -198,6 +204,7 @@
                 <div class="flex-1 relative flex justify-center items-center h-[380px] lg:h-[480px] w-full mt-8 lg:mt-0 select-none">
                     <div class="absolute w-80 h-80 bg-yellow-400/25 blur-3xl rounded-full z-0 animate-pulse"></div>
                     
+                    <!-- Gary Product visualizer -->
                     <div class="absolute -left-4 md:left-4 bottom-12 w-40 md:w-48 z-10 animate-bob-slow cursor-pointer transition-transform duration-300 hover:scale-110" onclick="openProductDetail('gary')">
                         <img src="https://www.papafrost.de/cdn-cgi/image/w%3D3000%2Cq%3D80%2Cf%3Dauto/media/fc/13/50/1768998492/101000_HD_1_Spongebob-Eis_Gary-Cookie_Zeydler.jpg?t=1768998492" 
                              alt="Gary Cookie Cup" 
@@ -207,6 +214,7 @@
                         </div>
                     </div>
 
+                    <!-- SpongeBob Product visualizer -->
                     <div class="absolute z-20 w-48 md:w-56 top-8 animate-bob cursor-pointer transition-transform duration-300 hover:scale-110" onclick="openProductDetail('spongebob')">
                         <img src="https://www.papafrost.de/cdn-cgi/image/w%3D3000%2Cq%3D80%2Cf%3Dauto/media/ee/94/30/1768998495/101003_HD_1_Spongebob-Eis_Spongebob-Vanille-Mango_Zeydler.jpg?t=1768998495" 
                              alt="SpongeBob Vanille Mango Cup" 
@@ -216,6 +224,7 @@
                         </div>
                     </div>
 
+                    <!-- Patrick Product visualizer -->
                     <div class="absolute -right-4 md:right-4 bottom-16 w-40 md:w-48 z-15 animate-bob-mid cursor-pointer transition-transform duration-300 hover:scale-110" onclick="openProductDetail('patrick')">
                         <img src="https://www.papafrost.de/cdn-cgi/image/w%3D3000%2Cq%3D80%2Cf%3Dauto/media/56/8c/77/1768998490/100998_HD_1_Spongebob-Eis_Patrick-Erdbeer-Drachenfrucht_Zeydler.jpg?t=1768998490" 
                              alt="Patrick Star Strawberry Dragonfruit Cup" 
@@ -241,13 +250,16 @@
                 </div>
 
                 <div id="ice-creams-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    </div>
+                    <!-- Dynamic rendering elements loaded via JS -->
+                </div>
 
             </div>
         </section>
 
+        <!-- Product Details Overlay Modal -->
         <div id="product-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-blue-950/90 backdrop-blur-md">
-            </div>
+            <!-- Modal Content dynamically injected -->
+        </div>
 
         <section id="quiz" class="py-20 px-4 md:px-12 bg-gradient-to-b from-blue-950 to-blue-900 border-t-8 border-yellow-400 relative z-10">
             <div class="max-w-4xl mx-auto bg-blue-900/60 rounded-3xl p-6 md:p-12 border-4 border-yellow-400 shadow-2xl">
@@ -263,7 +275,8 @@
                 </div>
 
                 <div id="quiz-container">
-                    </div>
+                    <!-- Loaded dynamically via JS -->
+                </div>
 
             </div>
         </section>
@@ -271,7 +284,7 @@
         <section id="bubble-game" class="py-20 px-4 md:px-12 bg-blue-950 relative z-10 border-t-8 border-yellow-400">
             <div class="max-w-4xl mx-auto text-center space-y-8">
                 <div class="space-y-2">
-                    <span class="text-4xl">🧼</span>
+                    <span class="text-4xl">💧</span>
                     <h2 class="font-bubble text-3xl md:text-5xl text-yellow-300">
                         Planktons Blasen-Abwehrspiel!
                     </h2>
@@ -324,11 +337,13 @@
                     </div>
 
                     <div id="cart-items-container" class="mt-6 space-y-4 overflow-y-auto max-h-[60vh] pr-1">
-                        </div>
+                        <!-- Items rendered via JS -->
+                    </div>
                 </div>
 
                 <div id="cart-footer" class="border-t border-blue-800 pt-6 space-y-4">
-                    </div>
+                    <!-- Checkout details dynamically appended -->
+                </div>
 
             </div>
         </div>
@@ -343,7 +358,8 @@
                 </h3>
                 
                 <div class="flex flex-wrap justify-center gap-6 text-sm text-blue-300">
-                    <a href="https://t.adcell.com/p/click?encodingId=7ecc89d24e472bd0fe1f5785834e820a" target="_blank" class="hover:text-yellow-400 transition-colors">Offizieller Partnershop</a>
+                    <!-- Updated Affiliate Link pointing to the new promo/slot parameters -->
+                    <a href="https://t.adcell.com/p/click?promoId=454804&slotId=76195&param0=https%3A%2F%2Fwww.papafrost.de%2Fsearch%3Fsearch%3Dspongebob" target="_blank" class="hover:text-yellow-400 transition-colors">Offizieller Partnershop</a>
                     <span>•</span>
                     <a href="#" class="hover:text-yellow-400 transition-colors">Impressum</a>
                     <span>•</span>
@@ -369,10 +385,10 @@
 
     </div>
 
+    <!-- Updated Bottom Tracking View Pixel to log traffic successfully -->
     <img src="https://t.adcell.com/p/view?promoId=454804&slotId=76195" border="0" width="1" height="1" alt="" class="hidden" />
 
     <script>
-        // Ice Cream Catalog DB - All Umlauts in IDs removed/normalized to prevent routing issues
         const iceCreams = [
             {
                 id: "spongebob",
@@ -460,7 +476,7 @@
                 desc: "Der krasse Eisbecher für Sparfüchse! Klassisches Spaghetti-Eis im Becher: Cremiges Vanilleeis verfeinert mit edler Erdbeersauce und weißen Raspelschokoladenstücken.",
                 ingredients: "Vollmilch, Sahne, Zucker, Erdbeersauce 6%, Raspelschokolade weiß (Kakaobutter, Vollmilchpulver, Zucker), Vanilleschoten-Extrakt.",
                 nutrition: { cal: "186 kcal", fat: "8.3g", carbs: "24.2g", sugar: "22.9g", protein: "3.4g", salt: "0.15g" },
-                emoji: "🦀",
+                emoji: "💰",
                 accentColor: "#E11D48",
                 imageUrl: "https://www.papafrost.de/cdn-cgi/image/w%3D3000%2Cq%3D80%2Cf%3Dauto/media/ee/00/36/1768998491/100999_HD_1_Spongebob-Eis_Mr.-Krabs-Spaghetti_Zeydler.jpg?t=1768998491"
             },
@@ -484,7 +500,6 @@
             }
         ];
 
-        // Quiz Database structure
         const quizQuestions = [
             {
                 question: "Wie verbringst du am liebsten deinen freien Sonntag?",
@@ -524,7 +539,8 @@
             quizResult: null,
             audioEnabled: true,
             bubbleScore: 0,
-            affiliateLink: "https://t.adcell.com/p/click?encodingId=7ecc89d24e472bd0fe1f5785834e820a"
+            // Updated Affiliate Link inside JS State targeting the correct promotion & slot IDs
+            affiliateLink: "https://t.adcell.com/p/click?promoId=454804&slotId=76195&param0=https%3A%2F%2Fwww.papafrost.de%2Fsearch%3Fsearch%3Dspongebob"
         };
 
         const playPopSound = () => {
@@ -566,7 +582,7 @@
             }, 3000);
         };
 
-        // Clipboard function specifically for iframes
+        // Copy voucher code workaround for iframes
         const copyVoucherCode = () => {
             const tempInput = document.createElement("input");
             tempInput.value = "BVEALICRGF";
@@ -948,14 +964,14 @@
             bubble.style.top = `${posY}px`;
             bubble.textContent = "POP!";
 
-            // Bubble Tap / Click Pop execution
+            // Bubble popping listener
             bubble.addEventListener('click', (e) => {
                 e.stopPropagation();
                 playPopSound();
                 state.bubbleScore += 1;
                 document.getElementById('game-score').textContent = state.bubbleScore;
 
-                // Win Game state trigger
+                // Win logic limit reached
                 if (state.bubbleScore >= 10) {
                     document.getElementById('game-win-overlay').classList.remove('hidden');
                 }
@@ -964,7 +980,6 @@
 
             container.appendChild(bubble);
 
-            // Upward Floating Tick interval
             const floatInterval = setInterval(() => {
                 posY -= speed;
                 bubble.style.top = `${posY}px`;
@@ -975,7 +990,6 @@
                 }
             }, 30);
 
-            // Clear timer if element removed
             bubble.dataset.timerId = floatInterval;
         };
 
@@ -1013,7 +1027,6 @@
                 return;
             }
 
-            // Render list entries
             container.innerHTML = state.cart.map(item => `
                 <div class="bg-blue-950/60 p-4 rounded-2xl border border-blue-800 flex items-center justify-between gap-3">
                     <div class="flex items-center gap-3">
@@ -1033,7 +1046,6 @@
                 </div>
             `).join('');
 
-            // Calculate overall sum
             const sum = state.cart.reduce((acc, curr) => acc + (curr.price * curr.qty), 0);
             
             footer.innerHTML = `
@@ -1062,6 +1074,7 @@
                     </p>
                 </div>
 
+                <!-- Updated Cart Checkout Link using the correct promotion/slot query params -->
                 <a href="${state.affiliateLink}" target="_blank" rel="noopener noreferrer" class="w-full bg-yellow-400 hover:bg-yellow-300 text-blue-950 font-bubble text-center py-4 rounded-2xl border-b-4 border-yellow-600 shadow-xl transition-all block text-lg active:scale-95">
                     🚀 Jetzt bei PapaFrost bestellen
                 </a>
@@ -1069,7 +1082,7 @@
         };
 
         window.onload = function() {
-            // Setup static layouts
+            // Initiate core systems
             generateBackgroundBubbles();
             renderProductGrid();
             renderQuiz();
@@ -1077,7 +1090,7 @@
             startGameEngine();
             initCountdownTimer();
 
-            // Audio control click event
+            // Toggle audio mute configuration
             document.getElementById('audio-toggle-btn').addEventListener('click', () => {
                 state.audioEnabled = !state.audioEnabled;
                 const icon = document.getElementById('audio-icon');
@@ -1091,7 +1104,7 @@
                 }
             });
 
-            // Cart drawers controllers
+            // Toggle drawer views
             document.getElementById('cart-toggle-btn').addEventListener('click', () => {
                 playPopSound();
                 document.getElementById('cart-drawer').classList.remove('hidden');
@@ -1101,7 +1114,7 @@
                 document.getElementById('cart-drawer').classList.add('hidden');
             });
 
-            // Reset game btn trigger
+            // Interactive game triggers
             document.getElementById('reset-game-btn').addEventListener('click', resetGame);
         };
     </script>
